@@ -24,4 +24,4 @@ class TypeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Type
-        fields = ('id', 'label')
+        fields = ('id', 'label',)
