@@ -8,8 +8,18 @@ from django.contrib.auth.models import User
 class RockView(ViewSet):
 
     def create(self, request):
+        chosen_type = Type.objects.get(pk=request.data['type_id'])
 
-        return Response("", status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        rock = Rock()
+        rock.user = request.auth.user
+        rock.weight = request.data['weight']
+        rock.name = request.data['name']
+        rock.type = chosen_type
+        rock.save()
+
+        serialized = RockSerializer(rock, many=False)
+
+        return Response(serialized.data, status=status.HTTP_201_CREATED)
     
     def list(self, request):
 
