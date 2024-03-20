@@ -22,9 +22,14 @@ class RockView(ViewSet):
         return Response(serialized.data, status=status.HTTP_201_CREATED)
     
     def list(self, request):
+        owner_only = self.request.query_params.get("owner", None)
 
         try:
             rocks = Rock.objects.all()
+
+            if owner_only is not None and owner_only == "current":
+                rocks = rocks.filter(user=request.auth.user)
+                
             serialized = RockSerializer(rocks, many=True)
             return Response(serialized.data, status=status.HTTP_200_OK)
         except Exception as ex:
@@ -36,9 +41,9 @@ class RockView(ViewSet):
         Returns:
             Response -- 200, 404, or 500 status code
         """
-        
         try:
             rock = Rock.objects.get(pk=pk)
+
             if rock.user.id == request.auth.user.id:
                 rock.delete()
                 return Response(None, status=status.HTTP_204_NO_CONTENT)
